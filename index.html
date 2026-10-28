@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>كامب الريان للرحلات والمغامرات - RAYAN CAMP TRIPS</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Cairo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- html2pdf.js for HTML to PDF rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            desert: {
+              50: '#fefcf6',
+              100: '#fdf6e7',
+              200: '#f9e8c3',
+              300: '#f4d291',
+              400: '#ebb358',
+              500: '#e1952a',
+              600: '#c5741f',
+              700: '#9d531c',
+              800: '#80421e',
+              900: '#6a371c',
+              950: '#3c1b0d',
+            },
+            sand: {
+              dark: '#1c1917',
+              card: '#282522',
+              border: '#44403c'
+            }
+          },
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #121110;
+      color: #f5f5f4;
+    }
+
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+      }
+      .pdf-container {
+        padding: 0 !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        color: #1a1a1a !important;
+      }
+      .pdf-card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        background-color: #fcfbf9 !important;
+        border: 1px solid #e5e7eb !important;
+        color: #1a1a1a !important;
+      }
+      .pdf-text-gold {
+        color: #b45309 !important;
+      }
+      .pdf-footer {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+    }
+
+    .avoid-break {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1c1917;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ebb358;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #e1952a;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-desert-500 selection:text-white">
+
+  <!-- TOP HEADER / NAVBAR -->
+  <header class="no-print sticky top-0 z-40 bg-sand-dark/95 backdrop-blur border-b border-sand-border shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-3 space-x-reverse">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-desert-600 to-desert-400 flex items-center justify-center text-stone-900 font-extrabold text-2xl shadow-md">
+          👑
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-desert-400 tracking-wide">RAYAN CAMP TRIPS</h1>
+          <p class="text-xs text-stone-400">كامب الريان للرحلات والمغامرات</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="downloadPdfBtn" onclick="generatePDF()" class="px-3 py-2 bg-gradient-to-r from-desert-500 to-desert-600 hover:from-desert-600 hover:to-desert-700 text-stone-950 font-bold rounded-lg shadow-md transition flex items-center gap-2 text-xs sm:text-sm">
+          <i class="fa-solid fa-file-pdf"></i>
+          <span>تحميل الرحلة الحالية PDF</span>
+        </button>
+        <button id="downloadAllPdfBtn" onclick="generateAllTripsPDF()" class="px-3 py-2 bg-stone-800 hover:bg-stone-700 text-desert-300 border border-desert-500/40 font-bold rounded-lg transition flex items-center gap-2 text-xs sm:text-sm">
+          <i class="fa-solid fa-folder-open"></i>
+          <span>تحميل كل الرحلات PDF</span>
+        </button>
+        <button onclick="handleAdminButtonClick()" class="px-3 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 border border-sand-border font-semibold rounded-lg transition flex items-center gap-2 text-xs sm:text-sm">
+          <i class="fa-solid fa-lock text-desert-400"></i>
+          <span>لوحة التحكم</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- TRIP NAVIGATION TABS -->
+  <nav class="no-print bg-stone-900 border-b border-sand-border/50 py-3 px-4">
+    <div class="max-w-7xl mx-auto flex items-center gap-3 overflow-x-auto pb-1" id="tripsNavTabs">
+      <!-- Generated Dynamically -->
+    </div>
+  </nav>
+
+  <!-- MAIN DISPLAY CONTENT (PDF Canvas Area) -->
+  <main class="flex-grow py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full">
+    <div id="pdfContent" class="pdf-container bg-stone-900/90 border border-sand-border/60 rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+      
+      <div class="absolute -top-24 -left-24 w-72 h-72 bg-desert-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-desert-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- TRIP HERO SECTION -->
+      <div class="text-center pb-8 border-b border-sand-border/80 avoid-break">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-desert-500/10 border border-desert-500/30 text-desert-400 font-semibold text-sm mb-4">
+          <span>🏜️</span>
+          <span id="displaySubtitle">A Day Full of Adventure, Fun & Amazing Memories</span>
+        </div>
+        
+        <h1 id="displayTitle" class="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-desert-300 via-desert-400 to-desert-600 mb-4 leading-tight">
+          برنامج يوم كامل في وادي الريان
+        </h1>
+        
+        <p id="displayDescription" class="text-stone-300 text-base sm:text-lg max-w-3xl mx-auto leading-relaxed">
+          يقدم لكم كامب الريان يومًا متكاملًا يجمع بين جمال الطبيعة والمغامرات والأنشطة الترفيهية والأجواء البدوية.
+        </p>
+
+        <div class="mt-6 inline-flex items-center gap-3 px-6 py-2.5 bg-stone-800/90 border border-desert-500/40 rounded-xl shadow-lg">
+          <i class="fa-solid fa-tag text-desert-400 text-lg"></i>
+          <span class="text-stone-300 text-sm font-bold">سعر الرحلة للفرد:</span>
+          <span id="displayBasePrice" class="text-desert-400 font-extrabold text-lg">يُحدد لاحقاً</span>
+        </div>
+      </div>
+
+      <!-- DYNAMIC SECTIONS LIST -->
+      <div id="displaySectionsContainer" class="mt-10 space-y-8">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- NOTES & GUIDELINES SECTION -->
+      <div id="displayNotesContainer" class="mt-10 avoid-break hidden">
+        <div class="bg-stone-800/60 border border-desert-500/30 rounded-xl p-5">
+          <h3 class="text-lg font-bold text-desert-400 mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>ملاحظات وإرشادات هامة</span>
+          </h3>
+          <ul id="displayNotesList" class="list-disc list-inside space-y-1.5 text-stone-300 text-sm leading-relaxed">
+          </ul>
+        </div>
+      </div>
+
+      <!-- FOOTER & BOOKING INFO -->
+      <footer id="pdfFooter" class="pdf-footer mt-12 pt-8 border-t border-sand-border avoid-break">
+        <div class="bg-gradient-to-r from-stone-950 via-stone-900 to-stone-950 border border-sand-border rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-desert-500/5 rounded-full blur-2xl pointer-events-none"></div>
+          
+          <div class="flex flex-col lg:flex-row items-center justify-between gap-6 text-center lg:text-right">
+            <div>
+              <div class="inline-flex items-center gap-2 text-desert-400 font-bold text-xs uppercase tracking-wider mb-2">
+                <span>🏕️</span>
+                <span>RAYAN CAMP | كامب الريان</span>
+              </div>
+              <h4 class="text-2xl font-black text-stone-100 mb-1">للحجز والاستعلام</h4>
+              <p class="text-stone-400 text-xs sm:text-sm">احجز مقعدك الآن واستمتع برحلة لا تُنسى وسط أروع الأجواء البدوية في الفيوم</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+              <a href="tel:01061609062" class="flex items-center gap-3 px-5 py-3 bg-stone-900 hover:bg-stone-800 text-stone-200 rounded-xl border border-stone-700 hover:border-desert-500/60 transition group shadow-md">
+                <div class="w-10 h-10 rounded-lg bg-desert-500/10 flex items-center justify-center text-desert-400 group-hover:scale-110 transition">
+                  <i class="fa-solid fa-phone"></i>
+                </div>
+                <div class="text-right">
+                  <span class="block text-[11px] text-stone-400 font-medium">أحمد بدوي</span>
+                  <span class="font-extrabold text-sm sm:text-base text-desert-300" dir="ltr">01061609062</span>
+                </div>
+              </a>
+
+              <a href="tel:01092721751" class="flex items-center gap-3 px-5 py-3 bg-stone-900 hover:bg-stone-800 text-stone-200 rounded-xl border border-stone-700 hover:border-desert-500/60 transition group shadow-md">
+                <div class="w-10 h-10 rounded-lg bg-desert-500/10 flex items-center justify-center text-desert-400 group-hover:scale-110 transition">
+                  <i class="fa-solid fa-phone"></i>
+                </div>
+                <div class="text-right">
+                  <span class="block text-[11px] text-stone-400 font-medium">شعبان محمد</span>
+                  <span class="font-extrabold text-sm sm:text-base text-desert-300" dir="ltr">01092721751</span>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-stone-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-500 gap-3">
+            <div>
+              <a href="https://facebook.com/RayanCamp" target="_blank" class="hover:text-desert-400 transition flex items-center gap-1.5">
+                <i class="fa-brands fa-facebook text-desert-400"></i>
+                <span>facebook.com/RayanCamp</span>
+              </a>
+            </div>
+            <div>
+              Rayan Camp Trips &copy; جميع الحقوق محفوظة
+            </div>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  </main>
+
+  <!-- HIDDEN CONTAINER FOR EXPORTING ALL TRIPS -->
+  <div id="allTripsExportContainer" class="hidden"></div>
+
+  <!-- LOGIN MODAL -->
+  <div id="loginModal" class="no-print fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-stone-900 border border-sand-border w-full max-w-md rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6 relative">
+      <button onclick="toggleLoginModal()" class="absolute top-4 left-4 text-stone-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center space-y-2">
+        <div class="w-16 h-16 bg-desert-500/10 border border-desert-500/30 rounded-full flex items-center justify-center mx-auto text-desert-400 text-2xl">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <h3 class="text-xl font-black text-stone-100">تسجيل الدخول للوحة التحكم</h3>
+        <p class="text-xs text-stone-400">يرجى إدخال اسم المستخدم وكلمة المرور للمتابعة</p>
+      </div>
+
+      <div id="loginErrorMsg" class="hidden bg-rose-950/80 border border-rose-700/60 text-rose-300 text-xs p-3 rounded-lg text-center">
+        اسم المستخدم أو كلمة المرور غير صحيحة!
+      </div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-stone-300 mb-1">اسم المستخدم</label>
+          <input type="text" id="loginUsername" required class="w-full bg-stone-950 border border-stone-700 rounded-lg p-3 text-sm text-stone-100 focus:border-desert-500 focus:ring-1 focus:ring-desert-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-stone-300 mb-1">كلمة المرور</label>
+          <input type="password" id="loginPassword" required class="w-full bg-stone-950 border border-stone-700 rounded-lg p-3 text-sm text-stone-100 focus:border-desert-500 focus:ring-1 focus:ring-desert-500 outline-none">
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-desert-500 to-desert-600 hover:from-desert-600 hover:to-desert-700 text-stone-950 font-black rounded-lg text-sm shadow-lg transition">
+          دخول اللوحة
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD MODAL -->
+  <div id="adminModal" class="no-print fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-stone-900 border border-sand-border w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+      
+      <div class="px-6 py-4 border-b border-sand-border flex items-center justify-between bg-stone-950">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-sliders text-desert-400 text-xl"></i>
+          <h2 class="text-xl font-bold text-stone-100">لوحة التحكم بإدارة الرحلات</h2>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="logoutAdmin()" class="text-xs text-rose-400 hover:text-rose-300 border border-rose-800 px-3 py-1.5 rounded-lg">
+            <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+          </button>
+          <button onclick="toggleAdminModal()" class="text-stone-400 hover:text-white text-xl">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-grow space-y-8">
+        
+        <div class="bg-stone-950 p-4 rounded-xl border border-sand-border flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3 min-w-[280px]">
+            <label class="text-sm font-bold text-stone-300">الرحلة الحالية:</label>
+            <select id="adminTripSelect" onchange="switchAdminTrip(this.value)" class="bg-stone-900 border border-stone-700 text-stone-100 text-sm rounded-lg p-2.5 focus:ring-desert-500 flex-grow">
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="addNewTrip()" class="px-4 py-2 bg-desert-600 hover:bg-desert-500 text-stone-950 font-bold rounded-lg text-sm transition flex items-center gap-1.5">
+              <i class="fa-solid fa-plus"></i>
+              <span>إضافة رحلة جديدة</span>
+            </button>
+            <button onclick="deleteCurrentTrip()" class="px-3 py-2 bg-rose-900/60 hover:bg-rose-800 text-rose-200 border border-rose-700/50 rounded-lg text-sm transition flex items-center gap-1.5">
+              <i class="fa-solid fa-trash"></i>
+              <span>حذف هذه الرحلة</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TRIP GENERAL DATA FORM -->
+        <div class="bg-stone-800/40 p-5 rounded-xl border border-sand-border space-y-4">
+          <h3 class="text-base font-bold text-desert-400 flex items-center gap-2 border-b border-stone-800 pb-2">
+            <i class="fa-solid fa-heading"></i>
+            <span>البيانات الأساسية للرحلة</span>
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-300 mb-1">عنوان الرحلة (عربي)</label>
+              <input type="text" id="adminTripTitle" class="w-full bg-stone-900 border border-stone-700 rounded-lg p-2.5 text-sm text-stone-100">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-300 mb-1">العنوان الفرعي / الشعارات</label>
+              <input type="text" id="adminTripSubtitle" class="w-full bg-stone-900 border border-stone-700 rounded-lg p-2.5 text-sm text-stone-100">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-300 mb-1">وصف الرحلة المقدم</label>
+            <textarea id="adminTripDescription" rows="2" class="w-full bg-stone-900 border border-stone-700 rounded-lg p-2.5 text-sm text-stone-100"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-300 mb-1">السعر الأساسي للرحلة (اختياري)</label>
+              <input type="text" id="adminTripBasePrice" placeholder="مثال: 450 ج.م أو يُحدد لاحقاً" class="w-full bg-stone-900 border border-stone-700 rounded-lg p-2.5 text-sm text-stone-100">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-300 mb-1">ملاحظات / إرشادات (مفصولة بفاصلة)</label>
+              <input type="text" id="adminTripNotes" placeholder="تيشيرت أبيض للحفلة, إحضار البطاقة..." class="w-full bg-stone-900 border border-stone-700 rounded-lg p-2.5 text-sm text-stone-100">
+            </div>
+          </div>
+        </div>
+
+        <!-- DYNAMIC SECTIONS BUILDER -->
+        <div class="bg-stone-800/40 p-5 rounded-xl border border-sand-border space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-800 pb-2">
+            <h3 class="text-base font-bold text-desert-400 flex items-center gap-2">
+              <i class="fa-solid fa-layer-group"></i>
+              <span>محطات وأقسام الرحلة الداخلية (Dynamic Sections)</span>
+            </h3>
+            <button onclick="addSectionToCurrentTrip()" class="px-3 py-1.5 bg-stone-700 hover:bg-stone-600 text-stone-100 rounded-lg text-xs font-bold transition flex items-center gap-1">
+              <i class="fa-solid fa-plus text-desert-400"></i>
+              <span>إضافة قسم جديد</span>
+            </button>
+          </div>
+
+          <div id="adminSectionsList" class="space-y-6">
+          </div>
+        </div>
+
+        <!-- PASSWORD CHANGE SECTION -->
+        <div class="bg-stone-800/40 p-5 rounded-xl border border-sand-border space-y-4">
+          <h3 class="text-base font-bold text-desert-400 flex items-center gap-2 border-b border-stone-800 pb-2">
+            <i class="fa-solid fa-key"></i>
+            <span>إعدادات كلمة المرور</span>
+          </h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+            <div>
+              <label class="block text-xs font-semibold text-stone-300 mb-1">كلمة المرور الجديدة</label>
+              <input type="password" id="newAdminPassword" placeholder="أدخل كلمة مرور جديدة" class="w-full bg-stone-900 border border-stone-700 rounded-lg p-2.5 text-sm text-stone-100">
+            </div>
+            <button onclick="changeAdminPassword()" class="px-4 py-2.5 bg-stone-700 hover:bg-stone-600 text-desert-300 font-bold rounded-lg text-sm transition">
+              حفظ كلمة المرور الجديدة
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="px-6 py-4 border-t border-sand-border bg-stone-950 flex items-center justify-between">
+        <button onclick="resetToDefaults()" class="text-xs text-stone-400 hover:text-stone-200 underline">
+          استعادة البيانات الافتراضية
+        </button>
+        <div class="flex items-center gap-3">
+          <button onclick="toggleAdminModal()" class="px-4 py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 rounded-lg text-sm font-semibold">
+            إلغاء
+          </button>
+          <button onclick="saveAdminChanges()" class="px-6 py-2 bg-desert-500 hover:bg-desert-600 text-stone-950 font-extrabold rounded-lg text-sm shadow-md transition">
+            حفظ التغييرات
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script>
+    const INITIAL_DATA = [
+      {
+        id: "rayan_full_day",
+        title: "برنامج يوم كامل في وادي الريان",
+        subtitle: "A Day Full of Adventure, Fun & Amazing Memories",
+        description: "يقدم لكم كامب الريان يومًا متكاملًا يجمع بين جمال الطبيعة والمغامرات والأنشطة الترفيهية والأجواء البدوية، وسط المناظر الطبيعية المميزة في الفيوم.",
+        basePrice: "يُحدد لاحقاً",
+        notes: ["يُفضّل إحضار تيشيرت أبيض لحفلة الألوان", "تتوفر غرف لتغيير الملابس بالكامب", "الخدمات الإضافية حسب التوافر والاتفاق"],
+        sections: [
+          {
+            id: "sec_1",
+            badge: "المحطة الأولى | FIRST STOP",
+            title: "شلالات وادي الريان | Wadi El Rayan Waterfalls",
+            description: "دخول محمية وادي الريان والاستمتاع بجولة داخل الوادي، مع مشاهدة الحفريات الموجودة بالمنطقة، ثم التوجه إلى شلالات وادي الريان للاستمتاع بالمناظر الطبيعية والتقاط الصور التذكارية.",
+            price: "شامل الرحلة",
+            mediaType: "emoji",
+            mediaValue: "🌊",
+            displaySize: "card"
+          },
+          {
+            id: "sec_2",
+            badge: "المحطة الثانية | SECOND STOP",
+            title: "هضبة المدورة | Gebel El Modawara",
+            description: "الاستمتاع بالإطلالة المميزة على الجبال والطبيعة، مع وقت مخصص للتصوير والاستمتاع بأجواء الصحراء والتأمل.",
+            price: "",
+            mediaType: "emoji",
+            mediaValue: "⛰️",
+            displaySize: "card"
+          },
+          {
+            id: "sec_3",
+            badge: "المحطة الثالثة | THIRD STOP",
+            title: "البحيرة المسحورة | The Magic Lake",
+            description: "زيارة البحيرة المسحورة والاستمتاع بجمال ألوانها والمناظر الطبيعية المحيطة بها، وسط الجبال والرمال مع وقت مميز للتصوير.",
+            price: "",
+            mediaType: "emoji",
+            mediaValue: "💙",
+            displaySize: "card"
+          },
+          {
+            id: "sec_4",
+            badge: "المحطة الرابعة | FOURTH STOP",
+            title: "الساند بورد والتزحلق | Sandboarding",
+            description: "تجربة مليئة بالحماس والمغامرة وسط الرمال الناعمة، لمحبي الأنشطة الصحراوية والتحديات الممتعة.",
+            price: "",
+            mediaType: "emoji",
+            mediaValue: "🏂",
+            displaySize: "card"
+          },
+          {
+            id: "sec_5",
+            badge: "المحطة الخامسة | FIFTH STOP",
+            title: "جولة المراكب والغناء | Boat Ride",
+            description: "جولة بالمراكب وسط أجواء البحيرة المسحورة، مع الغناء والضحك والمرح. الميكروفون مفتوح للمواهب!",
+            price: "",
+            mediaType: "emoji",
+            mediaValue: "🚣‍♂️",
+            displaySize: "card"
+          },
+          {
+            id: "sec_6",
+            badge: "الأنشطة الجماعية | ENTERTAINMENT",
+            title: "الألعاب والمسابقات الترفيهية | Group Games",
+            description: "كرة قدم، كرة طائرة، لعبة الزجاجة الدوارة، ألعاب حركية، وشد الحبل وتحديات ترفيهية بين الأصدقاء.",
+            price: "",
+            mediaType: "emoji",
+            mediaValue: "🏕️",
+            displaySize: "card"
+          },
+          {
+            id: "sec_7",
+            badge: "السهار والاحتفال | COLOR PARTY & BEDOUIN VIBES",
+            title: "حفلة الألوان، الكامب فاير، وشاي بدوي",
+            description: "فقرة مليئة بالألوان والطاقة، تليها جلسة بدوية هادئة حول النار مع الشاي البدوي الأصيل وسهرة المارشميلو والموسيقى.",
+            price: "",
+            mediaType: "emoji",
+            mediaValue: "🔥",
+            displaySize: "card"
+          },
+          {
+            id: "sec_8",
+            badge: "الوجبات والأطعمة | MEALS",
+            title: "الإفطار والغداء البدوي (اختياري)",
+            description: "الإفطار: فطير مشلتت، عسل أسود، جبنة قديمة.\nالغداء: ربع فرخة مشوية، أرز، خضار مشكل، عيش، سلطات.",
+            price: "يُحاسب عليه منفصلاً",
+            mediaType: "emoji",
+            mediaValue: "🍗",
+            displaySize: "icon"
+          },
+          {
+            id: "sec_9",
+            badge: "خدمات إضافية | EXTRA SERVICES",
+            title: "سفاري، ركوب خيل وجمال، وبيتش باجي",
+            description: "تتوفر إمكانية الاستفسار عن جولات البيتش باجي وعربيات السفاري وركوب الخيل حسب التوافر والاتفاق.",
+            price: "سعر إضافي",
+            mediaType: "emoji",
+            mediaValue: "🚙",
+            displaySize: "icon"
+          }
+        ]
+      }
+    ];
+
+    // AUTH & CREDENTIALS
+    const DEFAULT_USER = "احمد بدوي";
+    const DEFAULT_PASS = "بدوي احمد";
+    let isAuthenticated = false;
+
+    let trips = [];
+    let currentTripId = "";
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDataFromStorage();
+      renderTripTabs();
+      renderCurrentTrip();
+    });
+
+    function getAdminCredentials() {
+      const user = localStorage.getItem('rayan_admin_user') || DEFAULT_USER;
+      const pass = localStorage.getItem('rayan_admin_pass') || DEFAULT_PASS;
+      return { user, pass };
+    }
+
+    function handleAdminButtonClick() {
+      if (isAuthenticated) {
+        toggleAdminModal();
+      } else {
+        toggleLoginModal();
+      }
+    }
+
+    function toggleLoginModal() {
+      const modal = document.getElementById('loginModal');
+      modal.classList.toggle('hidden');
+      document.getElementById('loginErrorMsg').classList.add('hidden');
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('loginUsername').value.trim();
+      const p = document.getElementById('loginPassword').value.trim();
+      const creds = getAdminCredentials();
+
+      if (u === creds.user && p === creds.pass) {
+        isAuthenticated = true;
+        toggleLoginModal();
+        toggleAdminModal();
+      } else {
+        document.getElementById('loginErrorMsg').classList.remove('hidden');
+      }
+    }
+
+    function logoutAdmin() {
+      isAuthenticated = false;
+      toggleAdminModal();
+    }
+
+    function changeAdminPassword() {
+      const newPass = document.getElementById('newAdminPassword').value.trim();
+      if (!newPass) {
+        alert('يرجى كتابة كلمة المرور الجديدة');
+        return;
+      }
+      localStorage.setItem('rayan_admin_pass', newPass);
+      alert('تم تغيير كلمة المرور بنجاح!');
+      document.getElementById('newAdminPassword').value = '';
+    }
+
+    function loadDataFromStorage() {
+      const saved = localStorage.getItem('rayan_camp_trips_data');
+      if (saved) {
+        try {
+          trips = JSON.parse(saved);
+        } catch (e) {
+          trips = JSON.parse(JSON.stringify(INITIAL_DATA));
+        }
+      } else {
+        trips = JSON.parse(JSON.stringify(INITIAL_DATA));
+      }
+      if (trips.length > 0) {
+        currentTripId = trips[0].id;
+      }
+    }
+
+    function saveDataToStorage() {
+      localStorage.setItem('rayan_camp_trips_data', JSON.stringify(trips));
+    }
+
+    function renderTripTabs() {
+      const navContainer = document.getElementById('tripsNavTabs');
+      navContainer.innerHTML = '';
+
+      trips.forEach(trip => {
+        const isActive = trip.id === currentTripId;
+        const btn = document.createElement('button');
+        btn.className = `px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition flex items-center gap-2 ${
+          isActive 
+            ? 'bg-desert-500 text-stone-950 shadow-lg shadow-desert-500/20' 
+            : 'bg-stone-800 text-stone-300 hover:bg-stone-700 hover:text-white'
+        }`;
+        btn.onclick = () => switchTrip(trip.id);
+        btn.innerHTML = `<span>👑</span><span>${trip.title}</span>`;
+        navContainer.appendChild(btn);
+      });
+    }
+
+    function switchTrip(id) {
+      currentTripId = id;
+      renderTripTabs();
+      renderCurrentTrip();
+    }
+
+    function renderCurrentTrip() {
+      const trip = trips.find(t => t.id === currentTripId);
+      if (!trip) return;
+
+      document.getElementById('displayTitle').innerText = trip.title || 'بدون عنوان';
+      document.getElementById('displaySubtitle').innerText = trip.subtitle || '';
+      document.getElementById('displayDescription').innerText = trip.description || '';
+      document.getElementById('displayBasePrice').innerText = trip.basePrice || 'تُحدد لاحقاً';
+
+      const notesContainer = document.getElementById('displayNotesContainer');
+      const notesList = document.getElementById('displayNotesList');
+      notesList.innerHTML = '';
+      
+      if (trip.notes && trip.notes.length > 0 && trip.notes[0].trim() !== '') {
+        notesContainer.classList.remove('hidden');
+        trip.notes.forEach(note => {
+          if (note.trim()) {
+            const li = document.createElement('li');
+            li.innerText = note.trim();
+            notesList.appendChild(li);
+          }
+        });
+      } else {
+        notesContainer.classList.add('hidden');
+      }
+
+      const container = document.getElementById('displaySectionsContainer');
+      container.innerHTML = '';
+
+      trip.sections.forEach((sec, idx) => {
+        const card = document.createElement('div');
+        card.className = "pdf-card bg-stone-800/50 border border-sand-border/70 rounded-xl p-5 sm:p-6 shadow-md transition hover:border-desert-500/40 avoid-break flex flex-col gap-4";
+
+        let mediaHtml = '';
+        if (sec.mediaType === 'image' && sec.mediaValue) {
+          if (sec.displaySize === 'banner') {
+            mediaHtml = `<div class="w-full h-48 sm:h-64 rounded-lg overflow-hidden mb-2"><img src="${sec.mediaValue}" class="w-full h-full object-cover" alt="Section Media" /></div>`;
+          } else if (sec.displaySize === 'card') {
+            mediaHtml = `<div class="w-full h-36 rounded-lg overflow-hidden mb-2"><img src="${sec.mediaValue}" class="w-full h-full object-cover" alt="Section Media" /></div>`;
+          } else {
+            mediaHtml = `<img src="${sec.mediaValue}" class="w-12 h-12 rounded-lg object-cover border border-desert-500/30 shrink-0" alt="Icon" />`;
+          }
+        } else {
+          const emoji = sec.mediaValue || '✨';
+          if (sec.displaySize === 'icon') {
+            mediaHtml = `<span class="text-2xl p-2 bg-stone-700/50 rounded-lg shrink-0">${emoji}</span>`;
+          } else {
+            mediaHtml = `<div class="text-4xl mb-1">${emoji}</div>`;
+          }
+        }
+
+        const isIconLayout = sec.displaySize === 'icon';
+
+        card.innerHTML = `
+          ${!isIconLayout && sec.mediaType === 'image' && sec.displaySize === 'banner' ? mediaHtml : ''}
+          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              ${isIconLayout ? mediaHtml : ''}
+              <div>
+                ${sec.badge ? `<span class="pdf-text-gold inline-block text-xs font-bold text-desert-400 bg-desert-500/10 px-2.5 py-0.5 rounded-md border border-desert-500/20 mb-2">${sec.badge}</span>` : ''}
+                <h3 class="text-lg sm:text-xl font-bold text-stone-100 flex items-center gap-2">
+                  ${!isIconLayout && sec.mediaType === 'emoji' ? mediaHtml : ''}
+                  <span>${sec.title}</span>
+                </h3>
+              </div>
+            </div>
+            ${sec.price ? `<span class="self-start px-3 py-1 bg-stone-900/80 border border-sand-border text-desert-300 text-xs font-bold rounded-lg shrink-0">${sec.price}</span>` : ''}
+          </div>
+          ${!isIconLayout && sec.mediaType === 'image' && sec.displaySize === 'card' ? mediaHtml : ''}
+          ${sec.description ? `<p class="text-stone-300 text-sm leading-relaxed whitespace-pre-line border-t border-stone-800/60 pt-3">${sec.description}</p>` : ''}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function toggleAdminModal() {
+      const modal = document.getElementById('adminModal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) {
+        populateAdminForm();
+      }
+    }
+
+    function populateAdminForm() {
+      const select = document.getElementById('adminTripSelect');
+      select.innerHTML = '';
+      trips.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.innerText = t.title;
+        opt.selected = t.id === currentTripId;
+        select.appendChild(opt);
+      });
+
+      const trip = trips.find(t => t.id === currentTripId);
+      if (!trip) return;
+
+      document.getElementById('adminTripTitle').value = trip.title || '';
+      document.getElementById('adminTripSubtitle').value = trip.subtitle || '';
+      document.getElementById('adminTripDescription').value = trip.description || '';
+      document.getElementById('adminTripBasePrice').value = trip.basePrice || '';
+      document.getElementById('adminTripNotes').value = (trip.notes || []).join(', ');
+
+      renderAdminSectionsList(trip);
+    }
+
+    function switchAdminTrip(id) {
+      currentTripId = id;
+      renderTripTabs();
+      renderCurrentTrip();
+      populateAdminForm();
+    }
+
+    function renderAdminSectionsList(trip) {
+      const container = document.getElementById('adminSectionsList');
+      container.innerHTML = '';
+
+      trip.sections.forEach((sec, idx) => {
+        const secBox = document.createElement('div');
+        secBox.className = 'bg-stone-900 border border-stone-700/80 rounded-xl p-4 space-y-3 relative';
+        secBox.innerHTML = `
+          <div class="flex items-center justify-between border-b border-stone-800 pb-2">
+            <span class="text-xs font-extrabold text-desert-400">قسم #${idx + 1}</span>
+            <button onclick="removeSectionFromTrip(${idx})" class="text-xs text-rose-400 hover:text-rose-300 font-bold flex items-center gap-1">
+              <i class="fa-solid fa-trash"></i> حذف هذا القسم
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] text-stone-400 mb-1">شارة القسم (Badge)</label>
+              <input type="text" value="${sec.badge || ''}" onchange="updateSectionField(${idx}, 'badge', this.value)" class="w-full bg-stone-950 border border-stone-800 rounded p-2 text-xs text-stone-200">
+            </div>
+            <div>
+              <label class="block text-[11px] text-stone-400 mb-1">عنوان القسم</label>
+              <input type="text" value="${sec.title || ''}" onchange="updateSectionField(${idx}, 'title', this.value)" class="w-full bg-stone-950 border border-stone-800 rounded p-2 text-xs text-stone-200">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] text-stone-400 mb-1">الوصف التفصيلي</label>
+            <textarea rows="2" onchange="updateSectionField(${idx}, 'description', this.value)" class="w-full bg-stone-950 border border-stone-800 rounded p-2 text-xs text-stone-200">${sec.description || ''}</textarea>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
+            <div>
+              <label class="block text-[11px] text-stone-400 mb-1">السعر المخصص</label>
+              <input type="text" value="${sec.price || ''}" onchange="updateSectionField(${idx}, 'price', this.value)" class="w-full bg-stone-950 border border-stone-800 rounded p-2 text-xs text-stone-200">
+            </div>
+            <div>
+              <label class="block text-[11px] text-stone-400 mb-1">نوع الوسائط</label>
+              <select onchange="updateSectionField(${idx}, 'mediaType', this.value)" class="w-full bg-stone-950 border border-stone-800 rounded p-2 text-xs text-stone-200">
+                <option value="emoji" ${sec.mediaType === 'emoji' ? 'selected' : ''}>أيقونة / Emoji</option>
+                <option value="image" ${sec.mediaType === 'image' ? 'selected' : ''}>صورة (URL)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] text-stone-400 mb-1">قيمة الوسيط</label>
+              <input type="text" value="${sec.mediaValue || ''}" onchange="updateSectionField(${idx}, 'mediaValue', this.value)" class="w-full bg-stone-950 border border-stone-800 rounded p-2 text-xs text-stone-200">
+            </div>
+            <div>
+              <label class="block text-[11px] text-stone-400 mb-1">حجم العرض</label>
+              <select onchange="updateSectionField(${idx}, 'displaySize', this.value)" class="w-full bg-stone-950 border border-stone-800 rounded p-2 text-xs text-stone-200">
+                <option value="card" ${sec.displaySize === 'card' ? 'selected' : ''}>كارت (Card)</option>
+                <option value="banner" ${sec.displaySize === 'banner' ? 'selected' : ''}>صورة ممتدة (Banner)</option>
+                <option value="icon" ${sec.displaySize === 'icon' ? 'selected' : ''}>أيقونة صغيرة (Icon)</option>
+              </select>
+            </div>
+          </div>
+        `;
+        container.appendChild(secBox);
+      });
+    }
+
+    function updateSectionField(sectionIdx, field, val) {
+      const trip = trips.find(t => t.id === currentTripId);
+      if (trip && trip.sections[sectionIdx]) {
+        trip.sections[sectionIdx][field] = val;
+      }
+    }
+
+    function addSectionToCurrentTrip() {
+      const trip = trips.find(t => t.id === currentTripId);
+      if (trip) {
+        trip.sections.push({
+          id: 'sec_' + Date.now(),
+          badge: 'محطة جديدة',
+          title: 'عنوان القسم الجديد',
+          description: 'تفاصيل المحطة...',
+          price: '',
+          mediaType: 'emoji',
+          mediaValue: '✨',
+          displaySize: 'card'
+        });
+        renderAdminSectionsList(trip);
+      }
+    }
+
+    function removeSectionFromTrip(idx) {
+      const trip = trips.find(t => t.id === currentTripId);
+      if (trip) {
+        trip.sections.splice(idx, 1);
+        renderAdminSectionsList(trip);
+      }
+    }
+
+    function addNewTrip() {
+      const newId = 'trip_' + Date.now();
+      const newTrip = {
+        id: newId,
+        title: "رحلة جديدة ذات طابع خاص",
+        subtitle: "Adventure awaits you",
+        description: "وصف البرنامج الخاص بهذه الرحلة الجديدة...",
+        basePrice: "يُحدد لاحقاً",
+        notes: ["إحضار الملابس المناسبة"],
+        sections: [
+          {
+            id: "sec_init",
+            badge: "المحطة الأولى",
+            title: "عنوان المحطة الأولى",
+            description: "شرح تفاصيل هذه المحطة...",
+            price: "",
+            mediaType: "emoji",
+            mediaValue: "🏕️",
+            displaySize: "card"
+          }
+        ]
+      };
+      trips.push(newTrip);
+      currentTripId = newId;
+      saveDataToStorage();
+      renderTripTabs();
+      renderCurrentTrip();
+      populateAdminForm();
+    }
+
+    function deleteCurrentTrip() {
+      if (trips.length <= 1) {
+        alert("لا يمكن حذف جميع الرحلات. يجب أن تظل رحلة واحدة على الأقل.");
+        return;
+      }
+      if (confirm("هل أنت تأكد من حذف هذه الرحلة نهائياً؟")) {
+        trips = trips.filter(t => t.id !== currentTripId);
+        currentTripId = trips[0].id;
+        saveDataToStorage();
+        renderTripTabs();
+        renderCurrentTrip();
+        populateAdminForm();
+      }
+    }
+
+    function saveAdminChanges() {
+      const trip = trips.find(t => t.id === currentTripId);
+      if (trip) {
+        trip.title = document.getElementById('adminTripTitle').value;
+        trip.subtitle = document.getElementById('adminTripSubtitle').value;
+        trip.description = document.getElementById('adminTripDescription').value;
+        trip.basePrice = document.getElementById('adminTripBasePrice').value;
+        const rawNotes = document.getElementById('adminTripNotes').value;
+        trip.notes = rawNotes.split(',').map(n => n.trim()).filter(n => n !== '');
+      }
+      saveDataToStorage();
+      renderTripTabs();
+      renderCurrentTrip();
+      toggleAdminModal();
+    }
+
+    function resetToDefaults() {
+      if (confirm("هل تريد إعادة ضبط جميع الرحلات والبيانات إلى الوضع الافتراضي الأصلي؟")) {
+        localStorage.removeItem('rayan_camp_trips_data');
+        localStorage.removeItem('rayan_admin_pass');
+        loadDataFromStorage();
+        renderTripTabs();
+        renderCurrentTrip();
+        populateAdminForm();
+      }
+    }
+
+    function generatePDF() {
+      const element = document.getElementById('pdfContent');
+      const trip = trips.find(t => t.id === currentTripId);
+      const fileName = (trip ? trip.title : 'رحلة_كامب_الريان') + '.pdf';
+
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: fileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#1c1917' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+
+      const btn = document.getElementById('downloadPdfBtn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري التصدير...`;
+      btn.disabled = true;
+
+      html2pdf().set(opt).from(element).save().then(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }).catch(err => {
+        console.error(err);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      });
+    }
+
+    function generateAllTripsPDF() {
+      const exportContainer = document.getElementById('allTripsExportContainer');
+      exportContainer.innerHTML = '';
+      exportContainer.classList.remove('hidden');
+
+      trips.forEach((trip) => {
+        const tripWrapper = document.createElement('div');
+        tripWrapper.className = "bg-stone-900 border border-sand-border/60 rounded-2xl p-8 mb-12 shadow-2xl relative text-stone-100";
+        
+        let sectionsHtml = '';
+        trip.sections.forEach(sec => {
+          const emoji = sec.mediaValue || '✨';
+          const mediaHtml = `<div class="text-4xl mb-1">${emoji}</div>`;
+
+          sectionsHtml += `
+            <div class="bg-stone-800/50 border border-stone-700/70 rounded-xl p-6 mb-6 avoid-break">
+              <div class="flex items-start justify-between gap-3 mb-2">
+                <div>
+                  <span class="inline-block text-xs font-bold text-desert-400 bg-desert-500/10 px-2.5 py-0.5 rounded-md border border-desert-500/20 mb-2">${sec.badge || ''}</span>
+                  <h3 class="text-xl font-bold text-stone-100 flex items-center gap-2">
+                    ${sec.mediaType === 'emoji' ? mediaHtml : ''}
+                    <span>${sec.title}</span>
+                  </h3>
+                </div>
+                ${sec.price ? `<span class="px-3 py-1 bg-stone-900 border border-stone-700 text-desert-300 text-xs font-bold rounded-lg">${sec.price}</span>` : ''}
+              </div>
+              ${sec.description ? `<p class="text-stone-300 text-sm leading-relaxed whitespace-pre-line border-t border-stone-800 pt-3">${sec.description}</p>` : ''}
+            </div>
+          `;
+        });
+
+        let notesHtml = '';
+        if (trip.notes && trip.notes.length > 0 && trip.notes[0].trim() !== '') {
+          let liItems = trip.notes.map(n => `<li>${n}</li>`).join('');
+          notesHtml = `
+            <div class="bg-stone-800/60 border border-desert-500/30 rounded-xl p-5 mb-6 avoid-break">
+              <h3 class="text-lg font-bold text-desert-400 mb-2">ملاحظات وإرشادات هامة</h3>
+              <ul class="list-disc list-inside space-y-1 text-stone-300 text-sm">${liItems}</ul>
+            </div>
+          `;
+        }
+
+        tripWrapper.innerHTML = `
+          <div class="text-center pb-8 border-b border-stone-700 mb-8 avoid-break">
+            <span class="inline-block px-4 py-1 rounded-full bg-desert-500/10 text-desert-400 font-semibold text-sm mb-3">${trip.subtitle || ''}</span>
+            <h1 class="text-4xl font-black text-desert-400 mb-3">${trip.title}</h1>
+            <p class="text-stone-300 text-base max-w-2xl mx-auto">${trip.description}</p>
+            <div class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-stone-800 border border-desert-500/40 rounded-xl text-desert-300 font-bold text-sm">
+              <span>سعر الرحلة:</span> <span>${trip.basePrice || 'يُحدد لاحقاً'}</span>
+            </div>
+          </div>
+          ${sectionsHtml}
+          ${notesHtml}
+          <div class="mt-8 pt-6 border-t border-stone-700 avoid-break bg-stone-950 p-6 rounded-xl text-center">
+            <h4 class="text-lg font-bold text-desert-400 mb-1">للحجز والاستعلام | كامب الريان</h4>
+            <p class="text-stone-300 text-sm font-bold" dir="ltr">أحمد بدوي: 01061609062 — شعبان محمد: 01092721751</p>
+          </div>
+        `;
+        
+        exportContainer.appendChild(tripWrapper);
+      });
+
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: 'كل_رحلات_كامب_الريان.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#1c1917' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+
+      const btn = document.getElementById('downloadAllPdfBtn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري تصدير كل الرحلات...`;
+      btn.disabled = true;
+
+      html2pdf().set(opt).from(exportContainer).save().then(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        exportContainer.classList.add('hidden');
+      }).catch(err => {
+        console.error(err);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        exportContainer.classList.add('hidden');
+      });
+    }
+  </script>
+</body>
+</html>
